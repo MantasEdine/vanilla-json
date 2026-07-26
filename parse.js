@@ -1,5 +1,8 @@
 "use strict"
-//phase 1 :  Building Tokenizer (LEXER)
+// ============================================
+// Phase 1: Tokenizer (LEXER)
+// ============================================
+
 function isDigit(ch) {
     return ch >= '0' && ch <= '9'
 }
@@ -9,7 +12,7 @@ function tokenize(input) {
     for (let i = 0; i < input.length; i++) {
 
         if (input[i] === ' ' || input[i] === '\n' || input[i] === '\t' || input[i] === '\r') {
-            continue;                                    // whitespace: skip, no token
+            continue; // whitespace: skip, no token
 
         } else if (input[i] === '{') {
             tokens.push({ type: "brace-open" });
@@ -24,7 +27,7 @@ function tokenize(input) {
         } else if (input[i] === ',') {
             tokens.push({ type: "comma" });
 
-        } else if (input[i] === '"') {              
+        } else if (input[i] === '"') {
             let value = "";
             i++;
             while (i < input.length && input[i] !== '"') {
@@ -33,7 +36,17 @@ function tokenize(input) {
             }
             tokens.push({ type: "string", value: value });
 
-        } else if (input[i] === '-' || isDigit(input[i])) {   
+        } else if (input[i] === 't' && input.slice(i, i + 4) === "true") {
+            tokens.push({ type: "true" });
+            i += 3;
+        } else if (input[i] === 'f' && input.slice(i, i + 5) === "false") {
+            tokens.push({ type: "false" });
+            i += 4;
+        } else if (input[i] === 'n' && input.slice(i, i + 4) === "null") {
+            tokens.push({ type: "null" });
+            i += 3;
+
+        } else if (input[i] === '-' || isDigit(input[i])) {
             let value = "";
             value += input[i];
             i++;
@@ -41,31 +54,69 @@ function tokenize(input) {
                 value += input[i];
                 i++;
             }
-            i--;                                         
-            tokens.push({ type: "number", value: value });
+            i--; // give the neighbor back to the for loop
+            tokens.push({ type: "number", value: Number(value) });
 
         } else {
             throw new SyntaxError("Unexpected character '" + input[i] + "' at position " + i);
         }
     }
     return tokens;
-}// ===== TESTS =====
+}
 
-// 1. The acceptance test — want 13 flat tokens
-console.log(tokenize('{"a":5,"b":[1,2]}'));
+// ============================================
+// Phase 2: Parser
+// ============================================
 
-// 2. Whitespace-proof — same tokens as without spaces
-console.log(tokenize('{ "name" : "salamo" }'));
+function parse(tokens) {
+    let pos = 0;   // shared pointer: which token we're standing on
 
-// 3. Negative number + decimal
-console.log(tokenize('[-2.5,3]'));
+    function parseValue() {
+        let token = tokens[pos];
 
-// 4. Lone string — valid JSON on its own
-console.log(tokenize('"hello"'));
+        // TODO: dispatch on token.type
+        //   "number" / "string"  → pos++, return token.value
+        //   "true"               → pos++, return true
+        //   "false"              → pos++, return false
+        //   "null"               → pos++, return null
+        //   "brace-open"         → return parseObject()
+        //   "bracket-open"       → return parseArray()
+        //   anything else        → throw new SyntaxError("Unexpected token " + token.type)
+    }
 
-// 5. Empty containers
-console.log(tokenize('[]'));
-console.log(tokenize('{}'));
+    function parseArray() {
+        pos++;               // consume the bracket-open we're standing on
+        let arr = [];
 
-// 6. Bad input — must throw with character + position
-try { tokenize('{oops}') } catch (e) { console.log("caught:", e.message) }
+        // TODO: loop until you meet bracket-close:
+        //   arr.push(parseValue())      ← recursion does the heavy lifting
+        //   then: comma → consume, continue | bracket-close → consume, return arr
+        //   anything else → throw
+    }
+
+    function parseObject() {
+        pos++;               // consume the brace-open
+        let obj = {};
+
+        // TODO: loop until brace-close:
+        //   expect a string token (the key) — else throw
+        //   expect a colon — else throw
+        //   obj[key] = parseValue()
+        //   then comma-or-close, same dance as the array
+    }
+
+    return parseValue();
+}
+
+// ===== PARSER TESTS =====
+console.log(parse(tokenize('"hello"')));      // hello
+console.log(parse(tokenize('5')));            // 5
+console.log(parse(tokenize('true')));         // true
+console.log(parse(tokenize('[1,2,3]')));      // [ 1, 2, 3 ]
+console.log(parse(tokenize('[1,[2,[3]]]')));  // [ 1, [ 2, [ 3 ] ] ]
+console.log(parse(tokenize('{"a":5}')));      // { a: 5 }
+console.log(parse(tokenize('{"a":{"b":[1,true,null]}}'))); // { a: { b: [ 1, true, null ] } }
+let x = parse(tokenize('{"user":{"name":"salamo"}}'));
+console.log(x.user.name);                     // salamo
+try { parse(tokenize('{"a" 5}')) } catch (e) { console.log("caught:", e.message) }
+try { parse(tokenize('[1,]')) } catch (e) { console.log("caught:", e.message) }
