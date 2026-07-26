@@ -75,13 +75,40 @@ function parse(tokens) {
         let token = tokens[pos];
 
         // TODO: dispatch on token.type
-        //   "number" / "string"  → pos++, return token.value
-        //   "true"               → pos++, return true
-        //   "false"              → pos++, return false
-        //   "null"               → pos++, return null
-        //   "brace-open"         → return parseObject()
-        //   "bracket-open"       → return parseArray()
-        //   anything else        → throw new SyntaxError("Unexpected token " + token.type)
+       
+       if(token.type ==="string"){
+             pos++
+             return token.value
+
+       }else if(token.type === "number"){
+             pos++
+             return token.value
+             
+       }else if(token.type ==="true"){
+             pos++
+             return true
+
+       }else if(token.type ==="false"){
+             pos++
+             return false
+
+       }else if(token.type === "null"){
+             pos++
+             return null
+
+       }else if(token.type === "brace-open"){
+             
+             return parseObject()
+
+       }else if (token.type === "bracket-open"){
+
+             return parseArray()
+
+       }else {
+
+                throw new SyntaxtError("Unexpected token " + token.type)
+
+       }    
     }
 
     function parseArray() {
@@ -112,11 +139,11 @@ function parse(tokens) {
 console.log(parse(tokenize('"hello"')));      // hello
 console.log(parse(tokenize('5')));            // 5
 console.log(parse(tokenize('true')));         // true
-console.log(parse(tokenize('[1,2,3]')));      // [ 1, 2, 3 ]
-console.log(parse(tokenize('[1,[2,[3]]]')));  // [ 1, [ 2, [ 3 ] ] ]
-console.log(parse(tokenize('{"a":5}')));      // { a: 5 }
-console.log(parse(tokenize('{"a":{"b":[1,true,null]}}'))); // { a: { b: [ 1, true, null ] } }
-let x = parse(tokenize('{"user":{"name":"salamo"}}'));
-console.log(x.user.name);                     // salamo
-try { parse(tokenize('{"a" 5}')) } catch (e) { console.log("caught:", e.message) }
-try { parse(tokenize('[1,]')) } catch (e) { console.log("caught:", e.message) }
+//console.log(parse(tokenize('[1,2,3]')));      // [ 1, 2, 3 ]
+//console.log(parse(tokenize('[1,[2,[3]]]')));  // [ 1, [ 2, [ 3 ] ] ]
+//console.log(parse(tokenize('{"a":5}')));      // { a: 5 }
+//console.log(parse(tokenize('{"a":{"b":[1,true,null]}}'))); // { a: { b: [ 1, true, null ] } }
+//let x = parse(tokenize('{"user":{"name":"salamo"}}'));
+//console.log(x.user.name);                     // salamo
+//try { parse(tokenize('{"a" 5}')) } catch (e) { console.log("caught:", e.message) }
+//try { parse(tokenize('[1,]')) } catch (e) { console.log("caught:", e.message) }
