@@ -74,7 +74,6 @@ function parse(tokens) {
     function parseValue() {
         let token = tokens[pos];
 
-        // TODO: dispatch on token.type
        
        if(token.type ==="string"){
              pos++
@@ -106,7 +105,7 @@ function parse(tokens) {
 
        }else {
 
-                throw new SyntaxtError("Unexpected token " + token.type)
+                throw new SyntaxError("Unexpected token " + token.type)
 
        }    
     }
@@ -114,16 +113,37 @@ function parse(tokens) {
     function parseArray() {
         pos++;               // consume the bracket-open we're standing on
         let arr = [];
+      
+        while(tokens[pos].type !== "bracket-close"){
+             
+              if(tokens[pos].type === "comma"){
+                  
+                  pos++
+                    continue                 
+              }else {
+                  
+                  arr.push(parseValue())
+                   
+              }
+             
+        }    
+           pos++        
+           return arr
 
-        // TODO: loop until you meet bracket-close:
-        //   arr.push(parseValue())      ← recursion does the heavy lifting
-        //   then: comma → consume, continue | bracket-close → consume, return arr
-        //   anything else → throw
+
     }
 
     function parseObject() {
         pos++;               // consume the brace-open
         let obj = {};
+
+        
+
+
+
+
+
+
 
         // TODO: loop until brace-close:
         //   expect a string token (the key) — else throw
@@ -139,7 +159,7 @@ function parse(tokens) {
 console.log(parse(tokenize('"hello"')));      // hello
 console.log(parse(tokenize('5')));            // 5
 console.log(parse(tokenize('true')));         // true
-//console.log(parse(tokenize('[1,2,3]')));      // [ 1, 2, 3 ]
+console.log(parse(tokenize('[1,2,3]')));      // [ 1, 2, 3 ]
 //console.log(parse(tokenize('[1,[2,[3]]]')));  // [ 1, [ 2, [ 3 ] ] ]
 //console.log(parse(tokenize('{"a":5}')));      // { a: 5 }
 //console.log(parse(tokenize('{"a":{"b":[1,true,null]}}'))); // { a: { b: [ 1, true, null ] } }
