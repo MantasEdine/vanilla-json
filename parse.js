@@ -139,17 +139,22 @@ function parse(tokens) {
 
         
 
+        while(tokens[pos].type !== "brace-close"){
 
+           if(tokens[pos].type !== "string") throw new SyntaxError("Expected string got : " + tokens[pos].type) 
+           let key = tokens[pos].value
+           pos++
+           
+           if(tokens[pos].type !== "colon") throw new SyntaxError("Expected colon got : " + tokens[pos].type)
+           pos++
 
+           obj[key] = parseValue()
 
+           if(tokens[pos].type === "comma") pos++
+        }
+        pos++ 
+        return obj
 
-
-
-        // TODO: loop until brace-close:
-        //   expect a string token (the key) — else throw
-        //   expect a colon — else throw
-        //   obj[key] = parseValue()
-        //   then comma-or-close, same dance as the array
     }
 
     return parseValue();
@@ -160,10 +165,10 @@ console.log(parse(tokenize('"hello"')));      // hello
 console.log(parse(tokenize('5')));            // 5
 console.log(parse(tokenize('true')));         // true
 console.log(parse(tokenize('[1,2,3]')));      // [ 1, 2, 3 ]
-//console.log(parse(tokenize('[1,[2,[3]]]')));  // [ 1, [ 2, [ 3 ] ] ]
-//console.log(parse(tokenize('{"a":5}')));      // { a: 5 }
-//console.log(parse(tokenize('{"a":{"b":[1,true,null]}}'))); // { a: { b: [ 1, true, null ] } }
-//let x = parse(tokenize('{"user":{"name":"salamo"}}'));
-//console.log(x.user.name);                     // salamo
-//try { parse(tokenize('{"a" 5}')) } catch (e) { console.log("caught:", e.message) }
-//try { parse(tokenize('[1,]')) } catch (e) { console.log("caught:", e.message) }
+console.log(parse(tokenize('[1,[2,[3]]]')));  // [ 1, [ 2, [ 3 ] ] ]
+console.log(parse(tokenize('{"a":5}')));      // { a: 5 }
+console.log(parse(tokenize('{"a":{"b":[1,true,null]}}'))); // { a: { b: [ 1, true, null ] } }
+let x = parse(tokenize('{"user":{"name":"salamo"}}'));
+console.log(x.user.name);                     // salamo
+try { parse(tokenize('{"a" 5}')) } catch (e) { console.log("caught:", e.message) }
+try { parse(tokenize('[1,]')) } catch (e) { console.log("caught:", e.message) }
