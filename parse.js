@@ -139,3 +139,5 @@ function parse(tokens) {
 
     return parseValue()
 }
+
+module.exports = {parse , tokenize}

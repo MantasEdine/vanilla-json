@@ -81,4 +81,4 @@ function stringify(input) {
     return serialize(input)
 }
 
-
+module.exports = {stringify}

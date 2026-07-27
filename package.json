@@ -1,0 +1,25 @@
+{
+  "name": "@rabia_youcef/vanilla-json",
+  "version": "0.1.0",
+  "description": "Zero-dependency JSON serializer and parser built from scratch — matches native JSON.stringify/JSON.parse behavior, including the weird parts.",
+  "keywords": [
+    "[\"json\"",
+    "\"parser\"",
+    "\"tokenizer\"",
+    "\"zero-dependency\"]"
+  ],
+  "homepage": "https://github.com/MantasEdine/vanilla-json#readme",
+  "bugs": {
+    "url": "https://github.com/MantasEdine/vanilla-json/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MantasEdine/vanilla-json.git"
+  },
+  "author": "Rabia Youcef",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  }
+}
