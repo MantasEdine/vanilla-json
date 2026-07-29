@@ -1,4 +1,5 @@
 "use strict"
+// could change soon
 
 function isDigit(ch) {
     return ch >= '0' && ch <= '9'
