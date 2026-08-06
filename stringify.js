@@ -3,6 +3,7 @@ function stringify(input) {
     let seen = new WeakSet()
 
     function serialize(input) {
+
         switch (typeof input) {
 
             case "string": {
@@ -18,6 +19,15 @@ function stringify(input) {
                         str += '\\t'
                     } else if (input[i] === '\r') {
                         str += '\\r'
+
+                    } else if (input[i] === '\b'){
+                        str += '\\b'
+
+                    }else if (input[i]  === '\f'){
+                        str += '\\f'
+
+                    } else if (input.charCodeAt(i) <= 0x1F) {
+                        str += '\\u' + input.charCodeAt(i).toString(16).padStart(4, '0');
                     } else {
                         str += input[i]
                     }
@@ -26,6 +36,7 @@ function stringify(input) {
             }
 
             case "boolean": return String(input)
+            case "bigint" : throw new TypeError("Do not know how to serialize a BigInt")
 
             case "number":
                 if (Number.isFinite(input)) {
@@ -39,6 +50,16 @@ function stringify(input) {
             case "object":
                 if (input === null) {
                     return "null"
+
+                }
+
+                else if (typeof input.toJSON === "function") {
+                 return serialize(input.toJSON());
+            
+            
+
+
+
 
                 } else if (Array.isArray(input)) {
                     if (seen.has(input)) throw new TypeError("Converting circular structure to JSON")  // ← guard
