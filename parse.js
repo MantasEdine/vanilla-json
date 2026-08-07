@@ -27,7 +27,13 @@ function tokenize(input) {
             let value = ""
             i++
             while (i < input.length && input[i] !== '"') {
-                value += input[i]
+                if (input[i] === '\\' && i + 1 < input.length) {
+                    value += input[i]
+                    i++
+                    value += input[i]
+                } else {
+                    value += input[i]
+                }
                 i++
             }
             tokens.push({ type: "string", value: value })
@@ -44,10 +50,34 @@ function tokenize(input) {
             let value = ""
             value += input[i]
             i++
-            while (i < input.length && (isDigit(input[i]) || input[i] === ".")) {
+
+            while (i < input.length && isDigit(input[i])) {
                 value += input[i]
                 i++
             }
+
+            if (i < input.length && input[i] === '.') {
+                value += input[i]
+                i++
+                while (i < input.length && isDigit(input[i])) {
+                    value += input[i]
+                    i++
+                }
+            }
+
+            if (i < input.length && (input[i] === 'e' || input[i] === 'E')) {
+                value += input[i]
+                i++
+                if (i < input.length && (input[i] === '+' || input[i] === '-')) {
+                    value += input[i]
+                    i++
+                }
+                while (i < input.length && isDigit(input[i])) {
+                    value += input[i]
+                    i++
+                }
+            }
+
             i--
             tokens.push({ type: "number", value: Number(value) })
         } else {
@@ -61,12 +91,38 @@ function tokenize(input) {
 function parse(tokens) {
     let pos = 0
 
+    function unescape(str) {
+        let out = ""
+        for (let i = 0; i < str.length; i++) {
+            if (str[i] === '\\' && i + 1 < str.length) {
+                const next = str[i + 1]
+                if (next === 'n') { out += '\n'; i++ }
+                else if (next === 't') { out += '\t'; i++ }
+                else if (next === 'r') { out += '\r'; i++ }
+                else if (next === 'b') { out += '\b'; i++ }
+                else if (next === 'f') { out += '\f'; i++ }
+                else if (next === '\\') { out += '\\'; i++ }
+                else if (next === '"') { out += '"'; i++ }
+                else if (next === 'u') {
+                    const hex = str.slice(i + 2, i + 6)
+                    out += String.fromCharCode(parseInt(hex, 16))
+                    i += 5
+                } else {
+                    out += str[i]
+                }
+            } else {
+                out += str[i]
+            }
+        }
+        return out
+    }
+
     function parseValue() {
         let token = tokens[pos]
 
         if (token.type === "string") {
             pos++
-            return token.value
+            return unescape(token.value)
         } else if (token.type === "number") {
             pos++
             return token.value
@@ -141,4 +197,4 @@ function parse(tokens) {
     return parseValue()
 }
 
-module.exports = {parse , tokenize}
+module.exports = { parse, tokenize }
