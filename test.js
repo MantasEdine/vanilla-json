@@ -57,8 +57,8 @@ checkEqual("escape form feed", stringify("a\fb"), '"a\\fb"')
 checkEqual("escape null byte", stringify("a\x00b"), '"a\\u0000b"')
 checkEqual("escape control 0x01", stringify("a\x01b"), '"a\\u0001b"')
 checkEqual("escape control 0x1F", stringify("a\x1Fb"), '"a\\u001fb"')
-checkEqual("escape all specials", stringify('\\"\n\r\t\b\f'), '"\\\\\\\\"\\n\\r\\t\\b\\f"')
-
+const specialInput = '\\"\n\r\t\b\f'
+checkEqual("escape all specials", stringify(specialInput), JSON.stringify(specialInput))
 // ── Special Numbers ──
 checkEqual("stringify NaN", stringify(NaN), "null")
 checkEqual("stringify Infinity", stringify(Infinity), "null")
@@ -120,7 +120,6 @@ check("parse null", parse(tokenize('null')), null)
 
 // ── String Escapes (Parser) ──
 check("parse escaped quote", parse(tokenize('"say \\"hello\\""')), 'say "hello"')
-check("parse escaped backslash", parse(tokenize('"a\\b"')), 'a\\b')
 check("parse escaped newline", parse(tokenize('"a\\nb"')), 'a\nb')
 check("parse escaped tab", parse(tokenize('"a\\tb"')), 'a\tb')
 check("parse escaped backspace", parse(tokenize('"a\\bb"')), 'a\bb')
@@ -128,6 +127,7 @@ check("parse escaped form feed", parse(tokenize('"a\\fb"')), 'a\fb')
 check("parse escaped carriage return", parse(tokenize('"a\\rb"')), 'a\rb')
 check("parse unicode escape", parse(tokenize('"\\u0041\\u0042\\u0043"')), 'ABC')
 check("parse unicode smiley", parse(tokenize('"\\uD83D\\uDE00"')), '😀')
+check("parse escaped backslash", parse(tokenize('"a\\\\b"')), 'a\\b')
 
 // ── Numbers (Parser) ──
 check("parse negative float", parse(tokenize('-3.14')), -3.14)
