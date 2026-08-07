@@ -1,9 +1,16 @@
 {
   "name": "@rabia_youcef/vanilla-json",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Zero-dependency JSON serializer and parser built from scratch — matches native JSON.stringify/JSON.parse behavior, including the weird parts.",
   "homepage": "https://github.com/MantasEdine/vanilla-json#readme",
-  "keywords": ["json", "parser", "tokenizer", "zero-dependency", "lexer", "recursive-descent"],
+  "keywords": [
+    "json",
+    "parser",
+    "tokenizer",
+    "zero-dependency",
+    "lexer",
+    "recursive-descent"
+  ],
   "bugs": {
     "url": "https://github.com/MantasEdine/vanilla-json/issues"
   },
