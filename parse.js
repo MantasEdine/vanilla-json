@@ -1,5 +1,4 @@
 "use strict"
-// could change soon
 
 function isDigit(ch) {
     return ch >= '0' && ch <= '9'
@@ -35,6 +34,9 @@ function tokenize(input) {
                     value += input[i]
                 }
                 i++
+            }
+            if (i >= input.length) {
+                throw new SyntaxError("Unterminated string")
             }
             tokens.push({ type: "string", value: value })
         } else if (input[i] === 't' && input.slice(i, i + 4) === "true") {
@@ -118,6 +120,9 @@ function parse(tokens) {
     }
 
     function parseValue() {
+        if (pos >= tokens.length) {
+            throw new SyntaxError("Unexpected end of input")
+        }
         let token = tokens[pos]
 
         if (token.type === "string") {
@@ -148,6 +153,8 @@ function parse(tokens) {
         pos++
         let arr = []
 
+        if (pos >= tokens.length) throw new SyntaxError("Unexpected end of input")
+
         if (tokens[pos].type === "bracket-close") {
             pos++
             return arr
@@ -155,6 +162,8 @@ function parse(tokens) {
 
         while (true) {
             arr.push(parseValue())
+
+            if (pos >= tokens.length) throw new SyntaxError("Unexpected end of input")
 
             if (tokens[pos].type === "bracket-close") {
                 pos++
@@ -171,12 +180,16 @@ function parse(tokens) {
         pos++
         let obj = {}
 
+        if (pos >= tokens.length) throw new SyntaxError("Unexpected end of input")
+
         while (tokens[pos].type !== "brace-close") {
             if (tokens[pos].type !== "string") {
                 throw new SyntaxError("Expected string got : " + tokens[pos].type)
             }
             let key = tokens[pos].value
             pos++
+
+            if (pos >= tokens.length) throw new SyntaxError("Unexpected end of input")
 
             if (tokens[pos].type !== "colon") {
                 throw new SyntaxError("Expected colon got : " + tokens[pos].type)
@@ -185,8 +198,16 @@ function parse(tokens) {
 
             obj[key] = parseValue()
 
+            if (pos >= tokens.length) throw new SyntaxError("Unexpected end of input")
+
             if (tokens[pos].type === "comma") {
                 pos++
+                if (pos >= tokens.length) throw new SyntaxError("Unexpected end of input")
+                if (tokens[pos].type === "brace-close") {
+                    throw new SyntaxError("Trailing comma in object")
+                }
+            } else if (tokens[pos].type !== "brace-close") {
+                throw new SyntaxError("Expected comma or brace-close, got " + tokens[pos].type)
             }
         }
 
